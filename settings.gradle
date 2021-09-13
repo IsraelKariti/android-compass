@@ -1,2 +1,3 @@
 rootProject.name = "ANDROID_COMPASS_FOR_UNITY"
 include ':app'
+include ':compasslib'

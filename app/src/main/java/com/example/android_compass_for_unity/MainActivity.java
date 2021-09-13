@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private SensorManager sensorManager;
-
+    private Sensor sensor;
     private final float[] accelerometerReading = new float[3];
     private final float[] magnetometerReading = new float[3];
 
@@ -20,12 +20,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public final float[] orientationAngles = new float[3];
 
     TextView textView;
+    double theta;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
         textView = findViewById(R.id.tv);
     }
     @Override
@@ -39,15 +41,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // In this example, the sensor reporting delay is small enough such that
         // the application receives an update before the system checks the sensor
         // readings again.
+
         Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if (accelerometer != null) {
-            sensorManager.registerListener(this, accelerometer,
-                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
         }
+
         Sensor magneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         if (magneticField != null) {
-            sensorManager.registerListener(this, magneticField,
-                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+            sensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_FASTEST);
+        }
+
+        Sensor rotationVector = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        if (rotationVector != null) {
+            sensorManager.registerListener(this, rotationVector, SensorManager.SENSOR_DELAY_FASTEST);
         }
     }
     @Override
@@ -65,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             System.arraycopy(event.values, 0, magnetometerReading,
                     0, magnetometerReading.length);
+        }
+        else if(event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR){
+            theta = Math.asin(event.values[2])*2;
         }
         updateOrientationAngles();
     }
@@ -86,8 +96,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         SensorManager.getOrientation(rotationMatrix, orientationAngles);
 
         // "orientationAngles" now has up-to-date information.
-        textView.setText("first: "+ orientationAngles[0] +
-                "\nsecond: "+orientationAngles[1] +
-                "\nthird: "+orientationAngles[2]);
+        int m180p180 = (int)(orientationAngles[0]/Math.PI*180);
+        int zeroTo360 = (m180p180+360)%360;
+        textView.setText("calc: "+ zeroTo360+"\nRV: "+(int)theta);
     }
 }
