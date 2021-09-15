@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     0, magnetometerReading.length);
         }
         else if(event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR){
-            theta = Math.asin(event.values[2])*2;
+            theta = event.values[2];
         }
         updateOrientationAngles();
     }
@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // "orientationAngles" now has up-to-date information.
         int m180p180 = (int)(orientationAngles[0]/Math.PI*180);
         int zeroTo360 = (m180p180+360)%360;
-        textView.setText("calc: "+ zeroTo360+"\nRV: "+(int)theta);
+        int t = 359 - (((int)(theta*180) + 360)%360);
+        textView.setText("calc: "+ zeroTo360+"\nRV: "+t);
     }
 }

@@ -17,7 +17,7 @@ public class CompassLib implements SensorEventListener {
     public final float[] orientationAngles = new float[3];
     public int azimuth;
     public long time = 0;
-
+    public boolean accurate;
     public CompassLib(Activity activity){
 
 
@@ -46,7 +46,11 @@ public class CompassLib implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
-
+            if(i == SensorManager.SENSOR_STATUS_ACCURACY_HIGH){
+                accurate = true;
+            }else{
+                accurate = false;
+            }
     }
     // Compute the three orientation angles based on the most recent readings from
     // the device's accelerometer and magnetometer.
